@@ -1,5 +1,7 @@
 # File: user_run_SDM.r
 # Purpose: Run a new, full SDM model (all steps)
+setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regional_SDM_1")
+#run pkg_check.R
 library(checkpoint)
 checkpoint("2020-04-22", scanForPackages = FALSE)
 
@@ -10,27 +12,27 @@ rm(list=ls())
 # Step 1: Setting for the model run
 
 # species code (from lkpSpecies in modelling database. This will be the new folder name containing inputs/ouptuts)
-model_species <- "chiopalaorga"
+model_species <- "hymehenr"
 # loc_scripts is your repository. Make sure your git repository is set to correct branch
 loc_scripts <- here()
 # The main modelling folder for inputs/outputs. All sub-folders are created during the model run (when starting with step 1)
 loc_model <- here("_data", "species")
 # Modeling database
-nm_db_file <- here("_data", "databases", "SDM_lookupAndTracking_AZ.sqlite")
+nm_db_file <- here("_data", "databases", "SDM_lookupAndTracking.sqlite")
 # locations file (presence reaches). Provide full path; File is copied to modeling folder and timestamped.
-#nm_presFile <- here("_data", "occurrence", paste0(model_species, ".shp"))
-nm_presFile <- here("_data", "occurrence", paste0(model_species, ".gpkg"))
+nm_presFile <- here("_data", "occurrence", paste0(model_species, ".shp"))
+#nm_presFile <- here("_data", "occurrence", paste0(model_species, ".gpkg"))
 # env vars location [Terrestrial-only variable]
 loc_envVars = here("_data","env_vars","rasterClipped")
 # Name of background/envvars sqlite geodatabase, and base table name (2 length vector)
-nm_bkgPts <- c(here("_data","env_vars","tabular", "background_AZ.sqlite"), "background_pts")
+nm_bkgPts <- c(here("_data","env_vars","tabular", "background.sqlite"), "background_pts")
 # HUC spatial data set (shapefile) that is subsetted and used to define modeling area//range
 nm_HUC_file <- here("_data","other_spatial","feature","HUC10.shp")
 # map reference boundaries
 nm_refBoundaries = here("_data","other_spatial","feature", "US_States.shp")  # background grey reference lines in map
 
 # project overview - this appears in the first paragraph of the metadata
-project_overview = "This model was developed for the Arizona Game and Fish Department."
+project_overview = "This model was developed for the U. S. Fish and Wildlife."
 
 # model comment in database
 model_comments = ""
@@ -39,7 +41,7 @@ model_comments = ""
 metaData_comments = ""
 
 # your name
-modeller = "Tim Howard"
+modeller = "Nathan Pasco"
 
 # list the algorithms to apply in an ensemble model
 # options currently: "rf" (random forest), 
@@ -52,15 +54,11 @@ ensemble_algos = c("rf", "xgb")
 # list non-standard variables to add to model run
 add_vars = NULL
 # list standard variables to exclude from model run
-remove_vars = NULL
+#remove_vars = NULL
 
-remove_vars = c("nlcdopn1", "nlcdopn10", "nlcdopn100", "impsur1", "impsur10", "impsur100",
-  "ntm_1_01", "ntm_1_02", "ntm_1_06", "ntm_1_08", "ntm_1_09", "ntm_2_01",
-  "ntm_2_02", "ntm_2_05", "ntm_2_06", "ntm_3_01", "ntm_3_03", "ntm_3_09",
-  "ntm_3_12", "ntm_4_01", "ntm_4_02", "ntm_4_03", "ntm_4_05", "ntm_4_06",
-  "ntm_5_01", "ntm_6_01", "ntm_6_02", "ntm_6_03", "ntm_6_04", "nlcdshb1",
-  "nlcdshb10", "nlcdshb100")
-
+remove_vars = c("peakwarm10", "peakwarm1", "peak10", "peak1", "peakcool10", "peakcool1", "mountain10", "mountain1",
+"cliff1", "cliff10", "tp100x1000", "tp010x1000", "tpi001x1000", "slopex100", "geoalk", "geoextru", "geocoutw", "geofsed", "geoclay", 
++ "geoloam") 
 
 # do you want to stop execution after each modeling step (script)?
 prompt = FALSE
