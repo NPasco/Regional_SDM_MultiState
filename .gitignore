@@ -1,0 +1,21 @@
+# have git ignore the sqlite database 
+*.sqlite
+*.sqlite-journal
+# History files
+.Rhistory
+.Rapp.history
+
+# Session Data files
+.RData
+.Rproj.user
+
+*.gitignore
+
+# user_run_SDM user-files
+
+# RStudio project
+*.Rproj
+.Rproj.user
+*.Rdata
+
+user_run_SDM_*
