@@ -51,11 +51,11 @@ dbDisconnect(db)
 fn <- here("_data","databases", "hsm_tracker_connection_string_short.dsn")
 cn <- dbConnect(odbc::odbc(), .connection_string = readChar(fn, file.info(fn)$size))
 
-sql <- paste0("SELECT ModelCycle.EGT_ID, ModelCycle.model_cycle, ",
-              "Workflows.locality_data_eval_rubric, Workflows.model_reviewed ",
-              "FROM ModelCycle ",
-              "INNER JOIN Workflows ON ModelCycle.ID = Workflows.model_cycle_ID ",
-              "WHERE ModelCycle.EGT_ID= ", ElementNames$EGT_ID, ";")
+sql <- paste0("SELECT v2_ModelCycle.EGT_ID, v2_ModelCycle.model_cycle, ",
+              "v2_Workflows.locality_data_eval_rubric, v2_Workflows.model_reviewed ",
+              "FROM v2_ModelCycle ",
+              "INNER JOIN v2_Workflows ON v2_ModelCycle.ID = v2_Workflows.model_cycle_ID ",
+              "WHERE v2_ModelCycle.EGT_ID= ", ElementNames$EGT_ID, ";")
 
 evalAndReviewStatus <- dbGetQuery(cn, sql)
 modelCycleData <- evalAndReviewStatus[,c("EGT_ID","model_cycle")]

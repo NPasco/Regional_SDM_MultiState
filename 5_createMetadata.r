@@ -7,6 +7,7 @@
 
 # load libraries ----
 #library(ROCR)  #July 2010: order matters, see http://finzi.psych.upenn.edu/Rhelp10/2009-February/189936.html
+Sys.setenv(JAVA_HOME= "C:\\Program Files\\Java\\jre1.8.0_281")
 library(xtable)
 library(knitr)
 library(dplyr)
@@ -597,7 +598,7 @@ if(studyAreaHeight < 889000){
   bbox <- bb(bbox, height = 889000, relative = FALSE)
 }
 
-tmap_options(max.raster = c("plot" = 300000, "view" = 100000))
+tmap_options(max.raster = c("plot" = 10000, "view" = 100000))
 tmap_mode("plot")
 # get the basemap
 # for basemap options see http://leaflet-extras.github.io/leaflet-providers/preview/

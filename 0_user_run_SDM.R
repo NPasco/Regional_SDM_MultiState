@@ -1,6 +1,6 @@
 # File: user_run_SDM.r
 # Purpose: Run a new, full SDM model (all steps)
-setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regional_SDM_1")
+setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regional_SDM_MultiState")
 #run pkg_check.R
 library(checkpoint)
 checkpoint("2020-04-22", scanForPackages = FALSE)
@@ -12,7 +12,7 @@ rm(list=ls())
 # Step 1: Setting for the model run
 
 # species code (from lkpSpecies in modelling database. This will be the new folder name containing inputs/ouptuts)
-model_species <- "hymehenr"
+model_species <- "rhexparv"
 # loc_scripts is your repository. Make sure your git repository is set to correct branch
 loc_scripts <- here()
 # The main modelling folder for inputs/outputs. All sub-folders are created during the model run (when starting with step 1)
@@ -27,7 +27,7 @@ loc_envVars = here("_data","env_vars","raster", "ras")
 # Name of background/envvars sqlite geodatabase, and base table name (2 length vector)
 nm_bkgPts <- c(here("_data","env_vars","tabular", "background.sqlite"), "background_pts")
 # HUC spatial data set (shapefile) that is subsetted and used to define modeling area//range
-nm_HUC_file <- here("_data","other_spatial","feature","HUC10_FL.shp")
+nm_HUC_file <- here("_data","other_spatial","feature","HUC10.shp")
 # map reference boundaries
 nm_refBoundaries = here("_data","other_spatial","feature", "US_States.shp")  # background grey reference lines in map
 
@@ -41,7 +41,7 @@ model_comments = ""
 metaData_comments = ""
 
 # your name
-modeller = "Nathan Pasco"
+modeller = "Carly Voight"
 
 # list the algorithms to apply in an ensemble model
 # options currently: "rf" (random forest), 
@@ -57,7 +57,7 @@ add_vars = NULL
 #remove_vars = NULL
 
 remove_vars = c("peakwarm10", "peakwarm1", "peak10", "peak1", "peakcool10", "peakcool1", "mountain10", "mountain1",
-"cliff1", "cliff10", "tp100x1000", "tp010x1000", "tpi001x1000", "slopex100", "geoalk", "geoextru", "geocoutw", "geofsed", "geoclay", "geoloam") 
+"cliff1", "cliff10", "geoalk", "geoextru", "geocoutw", "geofsed", "geoclay", "geoloam", "impsur1", "impsur10", "impsur100") 
 
 # do you want to stop execution after each modeling step (script)?
 prompt = TRUE
@@ -119,11 +119,12 @@ run_SDM(
 # The scripts will automatically be accessed from 'loc_scripts' (if provided) 
 
 # or the location that was specified for the original model run. 
+setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regional_SDM_MultiState")
 library(here)
 rm(list=ls())
 
 # set project folder and species code for this run
-model_species <- "rhodchap"
+model_species <- "rhexparv"
 loc_model <- here("_data", "species")
 
 # set wd and load function
@@ -136,10 +137,12 @@ source(here("helper", "run_SDM.R"))
   # to add/remove variables, begin at step 2
   # to just run new model, begin at step 3 (see next example)
 run_SDM(
-  begin_step = "4",
-  model_species = "lythflag",
+  begin_step = "2",
+  model_species = "rhexparv",
   loc_model = loc_model,
-  loc_scripts = loc_scripts
+  loc_scripts = loc_scripts,
+  remove_vars = c("peakwarm10", "peakwarm1", "peak10", "peak1", "peakcool10", "peakcool1", "mountain10", "mountain1",
+                  "cliff1", "cliff10", "geoalk", "geoextru", "geocoutw", "geofsed", "geoclay", "geoloam", "impsur1", "impsur10", "impsur100")
 )
 
 
@@ -147,11 +150,11 @@ run_SDM(
 # example pick-up a model run at step 5 (metadata create)
   # if starting at step 4 or later, must provide model run name to model_rdata
 run_SDM(
-  begin_step = "4c",
-  model_species = "lythflag",
+  begin_step = "5",
+  model_species = "rhexparv",
   loc_model = loc_model,
-  loc_scripts = "G:/_Projects/USFWS_SE/Users/NathanPasco/USFWS_SE/Terrestrial/Regional_SDM_1",
-  model_rdata = "lythflag_20210216_091129.Rdata"
+  loc_scripts = "G:/_Projects/USFWS_SE/Users/NathanPasco/USFWS_SE/Terrestrial/Regional_SDM_MultiState",
+  model_rdata = "rhexparv_20210329_142025.Rdata"
 )
 
 
@@ -161,6 +164,7 @@ run_SDM(
 ##########
 
 # TESTING / DEBUGGING ONLY
+setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regional_SDM_MultiState")
 library(checkpoint)
 checkpoint("2020-04-22")
 
@@ -172,7 +176,7 @@ rm(list=ls())
 
 # for scripts 1-3, run just the following 3 lines
 
-model_species <- "hymehenr"
+model_species <- "rhexparv"
 
 load(here("_data","species",model_species,"runSDM_paths_most_recent.Rdata"))
 # if you want an earlier run, enter it and load it here:

@@ -2,6 +2,7 @@
 # Purpose: sampling of study area polygon to generate background random points
 
 ## start with a fresh workspace with no objects loaded
+setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regional_SDM_MultiState")
 rm(list=ls())
 library(sf)
 library(here)
@@ -11,12 +12,12 @@ library(RSQLite)
 
 setwd(here("_data","other_spatial","feature"))
 # states <- st_read("US_States.shp")
-stdyAreaHucs <- st_read("HUC10_full_bkg_area.gpkg",  "HUC10_bkg")
+stdyAreaHucs <- st_read("HUC10_SE.shp")
 
 # continual problems with ESRI Albers. Set it here manually
 # ignore the warning
 # st_crs(stdyArea) <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
-suppressWarnings(st_crs(stdyAreaHucs) <- 42303)
+# suppressWarnings(st_crs(stdyAreaHucs) <- 42303)
 
 # #study area is a dissolved representation
 sa <- st_union(stdyAreaHucs)
@@ -43,7 +44,7 @@ names(samps) <- c("fid", "huc10", "geometry")
 sampsDF <- data.frame(fid = samps$fid, huc10 = samps$huc10, wkt = st_as_text(samps$geometry))
 
 # send to database
-db <- dbConnect(SQLite(), paste0(pathToTab, "/", "background_AZ.sqlite"))
+db <- dbConnect(SQLite(), paste0(pathToTab, "/", "background.sqlite"))
 tp <- as.vector("INTEGER")
 names(tp) <- "fid"
 dbWriteTable(db, table, sampsDF, overwrite = TRUE, field.types = tp)
@@ -57,7 +58,10 @@ try(dbExecute(db, paste0("DELETE FROM lkpCRS where table_name = '", table, "';")
 dbWriteTable(db, "lkpCRS", tcrs, append = TRUE)
 
 # also write to geopackage  
-st_write(samps, dsn = paste0(pathToPts, "/", table, ".gpkg"),
+#st_write(samps, dsn = paste0(pathToPts, "/", table, ".gpkg"),
+#         layer = "bkg_pts",
+#         delete_layer = TRUE)
+st_write(samps, dsn = paste0(pathToPts, "/", table, ".shp"),
          layer = "bkg_pts",
          delete_layer = TRUE)
 

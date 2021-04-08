@@ -189,4 +189,3 @@ st_geometry(att_dat) <- NULL
 dbWriteTable(db, paste0(baseName, "_att"), att_dat, overwrite = TRUE)
 dbDisconnect(db)
 rm(db, SQLQuery)
-

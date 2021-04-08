@@ -315,14 +315,14 @@ if(length(sdm.customComments.subset$comments) > 1){
 @
 \pagebreak
 \begin{center}
-<<mapFig, fig.width=7, fig.height=7, include=FALSE, echo=FALSE, dev='png', dpi=200>>=
+ <<mapFig, fig.width=7, fig.height=7, include=FALSE, echo=FALSE, dev='png', dpi=200>>=
 
-print(mapFig)
+ print(mapFig)
 
-@
-\includegraphics{figure/mapFig-1.png}    
+ @
+\includegraphics{figure/mapFig-1.png}
 \end{center}
-Figure 4. A generalized view of the model predictions throughout the modeled area. If an ensemble was created this map shows simply an average of all model predictions. State boundaries are depicted as a thin gray line. The modeled area is outlined in red. Basemap: CartoDB.Positron (\copyright  \href{https://www.openstreetmap.org/copyright}{OpenStreetMap}, contributors: \copyright  \href{https://carto.com/attributions}{CARTO}).
+ Figure 4. A generalized view of the model predictions throughout the modeled area. If an ensemble was created this map shows simply an average of all model predictions. State boundaries are depicted as a thin gray line. The modeled area is outlined in red. Basemap: CartoDB.Positron (\copyright  \href{https://www.openstreetmap.org/copyright}{OpenStreetMap}, contributors: \copyright  \href{https://carto.com/attributions}{CARTO}).
 
 \normalsize
 
@@ -355,7 +355,7 @@ This model was built using a methodology developed through collaboration among t
 \end{minipage}%
 \begin{minipage}[c]{0.75\linewidth}
 Please cite this document and its associated SDM as: \\
-NatureServe and Heritage Network Partners. \Sexpr{format(Sys.Date(), "%Y")}. Species distribution model for \Sexpr{as.character(ElementNames$CommName)} (\textit{\Sexpr{as.character(ElementNames$SciName)}}). Created on \Sexpr{format(Sys.Date(), "%d %b %Y")}. Arlington, VA with Network partners from VA, PA, and NY.
+NatureServe and Heritage Network Partners. \Sexpr{format(Sys.Date(), "%Y")}. Species distribution model for \Sexpr{as.character(ElementNames$CommName)} (\textit{\Sexpr{as.character(ElementNames$SciName)}}). Created on \Sexpr{format(Sys.Date(), "%d %b %Y")}. Arlington, VA with Network partners from FL.
 \end{minipage}
 }
 
