@@ -145,48 +145,48 @@ par(mar=c(3,3,3,3),   #bottom, left, top, right
 # first a blank plot
 plot(0.5,0.5,lwd=0, col = "white", xlim = c(0,1), ylim = c(0,1),
      xlab="Avg. false positive rate", ylab="Avg. true positive rate")
-# now add each that was run  
+# now add each that was run
 #if no validation, then this will fail. Used to use if(exists("rf.perf"))...
-for(algo in ensemble_algos){
+# for(algo in ensemble_algos){
   if(algo == "rf" & exists("rf.perf")){
     specs <- figSpecs[match(algo,figSpecs$algos),]
     plot(rf.perf,
-         lwd=specs$lwd, 
+         lwd=specs$lwd,
          col=specs$col,
-         avg="threshold", 
+         avg="threshold",
          add = TRUE)
   }
-  if(algo == "me" & exists("me.perf")){
-    specs <- figSpecs[match(algo,figSpecs$algos),]
-    plot(me.perf, 
-         lwd=specs$lwd, 
-         col=specs$col,
-         avg="threshold", 
-         add = TRUE)
-  }
-  if(algo == "xgb"){
-    xgb.pred <- prediction(xgbFit1$pred$pres, xgbFit1$pred$obs)
-    xgb.perf <- performance(xgb.pred, "tpr","fpr")
-    specs <- figSpecs[match(algo,figSpecs$algos),]
-    plot(xgb.perf, 
-         lwd=specs$lwd, 
-         col=specs$col,
-         avg="threshold", 
-         add = TRUE)
-  }
-}
-#possible else if no models were validated: text(0.5,0.5, "No evaluation")
+   if(algo == "me" & exists("me.perf")){
+     specs <- figSpecs[match(algo,figSpecs$algos),]
+     plot(me.perf,
+          lwd=specs$lwd,
+          col=specs$col,
+          avg="threshold",
+          add = TRUE)
+   }
+   if(algo == "xgb"){
+     xgb.pred <- prediction(xgbFit1$pred$pres, xgbFit1$pred$obs)
+     xgb.perf <- performance(xgb.pred, "tpr","fpr")
+     specs <- figSpecs[match(algo,figSpecs$algos),]
+   plot(xgb.perf,
+          lwd=specs$lwd,
+          col=specs$col,
+          avg="threshold",
+          add = TRUE)
+   }
+ 
+ #possible else if no models were validated: text(0.5,0.5, "No evaluation")
 
-legend("bottomright", ensemble_algos, 
-       col = figSpecs[match(ensemble_algos,figSpecs$algos),"col"],
-       lwd = figSpecs[match(ensemble_algos,figSpecs$algos),"lwd"],
-       lty = figSpecs[match(ensemble_algos,figSpecs$algos),"lty"],
-       text.col = "black", 
-       merge = TRUE, bg = "gray95")
-  
-@
-\includegraphics{figure/ROCplot-1.pdf} %place it    
-\end{center}
+ legend("bottomright", ensemble_algos,
+        col = figSpecs[match(ensemble_algos,figSpecs$algos),"col"],
+        lwd = figSpecs[match(ensemble_algos,figSpecs$algos),"lwd"],
+        lty = figSpecs[match(ensemble_algos,figSpecs$algos),"lty"],
+        text.col = "black",
+        merge = TRUE, bg = "gray95")
+
+ @
+ \includegraphics{figure/ROCplot-1.pdf} %place it
+ \end{center}
 Figure 2. ROC plot for all \Sexpr{length(group$vals)} validation runs, 
 averaged along cutoffs, for each modeling algorithm.
 

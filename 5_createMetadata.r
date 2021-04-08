@@ -28,6 +28,8 @@ library(gtable)
 library(grid)
 library(gridExtra)
 
+library(DBI)
+
 ### find and load model data ----
 #setwd(loc_model)
 dir.create(file.path(loc_model, model_species, "outputs","metadata"), recursive = TRUE, showWarnings = FALSE)
@@ -68,18 +70,18 @@ dbDisconnect(db)
 # but background inputs vary
 summ.table <- data.frame(
   Sample=c("Presence locations (groups)",
-        "Subsamples within groups",
-        "Total presence inputs",
-        paste0("Background inputs - ", inputs$algorithm)),
+           "Subsamples within groups",
+           "Total presence inputs",
+           paste0("Background inputs - ", inputs$algorithm)),
   Count=c(
     ifelse(inputs$jckn_grp_column[[1]] == "stratum", 
            inputs$feat_count[[1]],
            inputs$feat_grp_count[[1]]
-           ),
+    ),
     inputs$mn_grp_subsamp[[1]],
     inputs$tot_obs_subsamp[[1]],
     paste0(inputs$tot_bkgd_subsamp)
-     ))
+  ))
 # summ.table is what gets used in knitr file
 rm(db, sql)
 
@@ -130,46 +132,46 @@ vuStatsList <- lapply(vuStatsList, FUN = function(x) x[,!names(x)=="algo"])
 for(algo in names(vuStatsList)){
   if(algo == "me"){
     algodat <- data.frame(Name = c("linear feature type used",
-                                 "product feature type used",
-                                 "quadratic feature type used",
-                                 "hinge feature type used"),
-               value = c("yes","yes","yes","yes"))
+                                   "product feature type used",
+                                   "quadratic feature type used",
+                                   "hinge feature type used"),
+                          value = c("yes","yes","yes","yes"))
     vuStatsList[[algo]] <- rbind(vuStatsList[[algo]], algodat)
   }
   if(algo == "xgb"){
     algodat <- data.frame(Name = c(
-                                  "iterations",
-                                  "eta",
-                                  "max depth",
-                                  "gamma",
-                                  "colsample by tree",
-                                  "min child weight",
-                                  "subsample",
-                                  "objective"),
-                         value = c(
-                                   xgb.full$niter,
-                                   xgb.full$params$eta,
-                                   xgb.full$params$max_depth,
-                                   xgb.full$params$gamma,
-                                   xgb.full$params$colsample_bytree,
-                                   xgb.full$params$min_child_weight,
-                                   xgb.full$params$subsample,
-                                   xgb.full$params$objective
-                                   ))
+      "iterations",
+      "eta",
+      "max depth",
+      "gamma",
+      "colsample by tree",
+      "min child weight",
+      "subsample",
+      "objective"),
+      value = c(
+        xgb.full$niter,
+        xgb.full$params$eta,
+        xgb.full$params$max_depth,
+        xgb.full$params$gamma,
+        xgb.full$params$colsample_bytree,
+        xgb.full$params$min_child_weight,
+        xgb.full$params$subsample,
+        xgb.full$params$objective
+      ))
     #paste0(deparse(xgb.full$call), collapse = ""),
     vuStatsList[[algo]] <- rbind(vuStatsList[[algo]], algodat)
   }
   if(algo == "rf"){
     algodat <- data.frame(Name = c(
-                                "mtry",
-                                "number of trees",
-                                "type of trees"
-                              ),
-                        value = c(
-                                rf.full$mtry,
-                                rf.full$ntree,
-                                rf.full$type
-                              )
+      "mtry",
+      "number of trees",
+      "type of trees"
+    ),
+    value = c(
+      rf.full$mtry,
+      rf.full$ntree,
+      rf.full$type
+    )
     )
     vuStatsList[[algo]] <- rbind(vuStatsList[[algo]], algodat)
   }
@@ -330,6 +332,7 @@ impPlot <- ggplot(data = varsSorted) +
 #### temporary  TODO
 if(exists("pPlots")){
   rf.pPlots <- pPlots
+  rf.elist <- unlist(lapply(rf.pPlots, FUN = function(x) x$fname))
 }
 
 maxVars <- 0
@@ -381,17 +384,17 @@ if(mostPplotsAlgo == "rf"){
 
 for (plotpi in 1:numPPl){
   evar <- pplotVars$fullName[[plotpi]]
-
+  
   #get gridname
   grdName <- unique(varsImp.full[varsImp.full$fullName == evar, "gridName"])
   
   #dens data
   df.full <- rbind(df.in, df.abs)
   densdat <- data.frame(x = df.full[,grdName], pres = df.full[,"pres"])
-
+  
   # pplot data
   # do rf only if there are data
-  rfLoc <- match(evar, elist)
+  rfLoc <- match(evar, rf.elist)
   if(exists("rf.pPlots") & !is.na(rfLoc)){
     grdFullName <- rf.pPlots[[rfLoc]]$fname
     dat <- data.frame(x = rf.pPlots[[rfLoc]]$x, y = rf.pPlots[[rfLoc]]$y)
@@ -473,7 +476,7 @@ for (plotpi in 1:numPPl){
     }
   }
   
- pplot <- ggplot(data = dat, aes(x=x, y=y, color = algo)) + 
+  pplot <- ggplot(data = dat, aes(x=x, y=y, color = algo)) + 
     geom_line(size = 1) +
     xlab(evar) + 
     scale_x_continuous(limits = c(min(dat$x), max(dat$x)), 
@@ -483,15 +486,16 @@ for (plotpi in 1:numPPl){
           plot.margin = margin(t = 1, r = 5, b = 5, l = 5, unit = "pt"),
           text = element_text(size=8),
           panel.border = element_rect(colour = "black", fill=NA, size=0.25)
-          ) + 
+    ) + 
     scale_color_manual(values = scaleVec)
-
+  
   # create the density plot
   densplot <- ggplot(data = densdat, aes(x = x, color = factor(pres, labels = c("background","presence")))) + 
     geom_density(size = 0.5, show.legend = FALSE) + 
-    scale_x_continuous(limits = c(min(densdat$x), max(densdat$x)), 
-                       expand = expansion(mult = c(0.05)),
-                       breaks = NULL) +
+    # scale_x_continuous(limits = c(min(densdat$x), max(densdat$x)),
+    #                    expand = expansion(mult = c(0.05)),
+    #                    breaks = NULL) +
+    scale_x_continuous(breaks = NULL) +
     scale_y_continuous(breaks = NULL) + 
     theme_classic() + 
     theme(axis.title.y = element_blank(), legend.position = "none",
@@ -503,19 +507,19 @@ for (plotpi in 1:numPPl){
           axis.line.x = element_blank(),
           plot.margin = margin(t = 2, r = 0, b = 1, l = 0, unit = "pt")) +
     scale_color_manual(values=c("grey60", "black")) 
-    #theme_void()
-
+  #theme_void()
+  
   # now do the layout
   gdens <- ggplotGrob(densplot)
   gpplt <- ggplotGrob(pplot)
   panel_id <- gpplt$layout[gpplt$layout$name == "panel",c("t","l")]
   gpplt <- gtable_add_rows(gpplt, unit(0.25,"null"), 0)
   gpplt <- gtable_add_grob(gpplt, gdens,
-                       t = 1, l = panel_id$l)
+                           t = 1, l = panel_id$l)
   #grid.newpage()
   #grid.draw(gpplt)
   grobList[[plotpi]] <- gpplt
-
+  
   # if on loop with most lines, extract legends
   if(plotpi == plotForLeg){
     # Function to extract legend
@@ -535,19 +539,19 @@ for (plotpi in 1:numPPl){
     
     legPlot2 <- densplot + 
       geom_freqpoly(binwidth = 1000) + # hack to get lines instead of squares in legend
-      scale_x_continuous() + 
+      #scale_x_continuous() + 
       labs(color = "Density") +
       theme(legend.position = "bottom",
             legend.margin=margin(t=0, r=0, b=0, l=0, unit="pt"),
             text = element_text(size=14))
     legend2 <- g_legend(legPlot2)
   }
-    
+  
 }
 
 # set up legend grobs
 legGb <- arrangeGrob(grobs=list(legend2, legend1), 
-                  layout_matrix=rbind(c(1,2)))
+                     layout_matrix=rbind(c(1,2)))
 
 # set up full figure
 gt <- arrangeGrob(grobs=grobList, 
@@ -614,11 +618,11 @@ basetiles <- read_osm(bbox, type = mtype, ext = 1.1)
 mapFig <- qtm(basetiles) +
   tm_shape(ras) +
   tm_raster(palette = clrs, title = "modeled suitability",
-      labels = c("Low Habitat Suitability", rep(" ", nclr-2), "High Habitat Suitability")) +
+            labels = c("Low Habitat Suitability", rep(" ", nclr-2), "High Habitat Suitability")) +
   tm_shape(referenceBoundaries) +
   tm_borders(col = "grey", lwd = 1) +
   tm_shape(studyAreaExtent) +
-    tm_borders(col = "red", lwd = 2) +
+  tm_borders(col = "red", lwd = 2) +
   tm_compass(north = 0, type = "arrow", position = c("left","bottom")) +
   tm_scale_bar()
 
@@ -710,17 +714,17 @@ sdm.thresh.list <- lapply(sdm.thresh.list, FUN = function(x) x[,!names(x)=="algo
 #attr(sdm.thresh.list, "subheadings") <- paste0("Algorithm = ", names(sdm.thresh.list))
 # with colored text following lines on figures
 attr(sdm.thresh.list, "subheadings") <- paste0("\\textcolor{",
-                          names(sdm.thresh.list), "Color}{", 
-                          "Algorithm = ", 
-                          names(sdm.thresh.list),"}")
+                                               names(sdm.thresh.list), "Color}{", 
+                                               "Algorithm = ", 
+                                               names(sdm.thresh.list),"}")
 
 # can't get xtable's sanitize functions to work, manually escape % here. 
 # attr(sdm.thresh.list, "message") <- paste0(thresh.descr$cutCode, ": ",
 #                             gsub("%","\\%",thresh.descr$cutDescription, fixed = TRUE))
 
 sdm.thresh.list.xtbl <- xtableList(sdm.thresh.list, 
-                          align = "llrrr",
-                          digits=c(0,0,3,0,0))
+                                   align = "llrrr",
+                                   digits=c(0,0,3,0,0))
 
 thresh.descr.xtbl <- xtable(thresh.descr, 
                             align = "lllp{3in}")
@@ -795,6 +799,71 @@ knit2pdf(paste(loc_scripts,"MetadataEval_knitr.rnw",sep="/"), output=paste(model
 #   }
 # }
 
+## write up output info to tracking DB  ---
+## If metadata pdf creation successful, then full model run complete,
+## so this is an appropriate time to populate Tracking DB
+# get tracking DB connection info
+trackerDsnInfo <- here("_data","databases", "hsm_tracker_connection_string_short.dsn")
+
+
+## get model cycle info from the tracking db
+cn <- dbConnect(odbc::odbc(), .connection_string = readChar(trackerDsnInfo, file.info(trackerDsnInfo)$size))
+# get model cycle we are on
+sql <- paste0("SELECT v2_Elements.ID, v2_Elements.Taxonomic_Group, V2_Elements.Location_Use_Class, ",
+              "v2_Cutecodes.cutecode, ",
+              "v2_ModelCycle.ID, v2_ModelCycle.model_cycle ",
+              "FROM (v2_Elements INNER JOIN v2_Cutecodes ON v2_Elements.ID = v2_Cutecodes.Elements_ID) ",
+              "INNER JOIN v2_ModelCycle ON v2_Elements.ID = v2_ModelCycle.Elements_ID ",
+              "WHERE (((v2_Cutecodes.cutecode)= '", ElementNames$Code, "'));")
+
+model_cycle <- dbGetQuery(cn, sql)
+names(model_cycle) <- c("Elements_ID","taxonomic_group","luc","cutecode","model_cycle_ID", "model_cycle")
+dbDisconnect(cn)
+
+
+# get most recent cycle (last row after sorting)
+model_cycle <- model_cycle[order(model_cycle$model_cycle),]
+model_cycle <- model_cycle[nrow(model_cycle),]
+
+outputsDat <- model_cycle[,c("model_cycle_ID"), drop = FALSE]
+names(outputsDat) <- "model_cycle_id"
+outputsDat$model_run_name <- model_run_name
+outputsDat$path_to_output <- file.path(loc_model, model_species,"outputs","model_predictions")
+outputsDat$modeling_machine <- model_comp_name
+outputsDat$comment <- NA
+outputsDat$ensemble_code <- NA
+
+# duplicate rows based on number of algorithms
+repTimes <- length(ensemble_algos)
+outputsDat <- outputsDat[rep(1, repTimes),]
+
+outputsDat$algorithm_code <- ensemble_algos
+outputsDat$output_file_name <- paste0(model_run_name,"_",ensemble_algos,".tif")  
+# decision: don't put up info about the mean suitabilities ensemble. Only use it for the metadata map
+
+outputsDat <- outputsDat[,c("model_cycle_id","model_run_name","algorithm_code","output_file_name",
+                            "path_to_output","modeling_machine","comment")]
+
+# push up the data
+cn <- dbConnect(odbc::odbc(), .connection_string = readChar(trackerDsnInfo, file.info(trackerDsnInfo)$size))
+
+# are these data already up there? if so, delete and re-upload
+# base it on file name
+sql <- paste0("SELECT * from v2_Outputs where output_file_name IN (",
+              toString(sQuote(outputsDat$output_file_name, q = FALSE)), ");")
+
+datUpThere <- dbGetQuery(cn, sql)
+
+if(nrow(datUpThere) > 0){
+  sql <- paste0("DELETE from v2_Outputs where ID IN (",
+                toString(datUpThere$ID), ");")
+  dbExecute(cn, sql)
+}
+
+# now upload the rows
+dbAppendTable(cn, "v2_Outputs", outputsDat)
+dbDisconnect(cn)
+rm(cn)
 
 ## clean up ----
 #dbDisconnect(db)

@@ -7,8 +7,8 @@ library(raster)
 library(randomForest)
 library(RSQLite)
 library(sf)
-# library(snow)
-# library(parallel)
+library(snow)
+library(parallel)
 
 removeTmpFiles(48) # clean old (>2days) Raster temporary files
 
