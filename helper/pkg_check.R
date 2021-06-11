@@ -1,8 +1,6 @@
 # This script installs/updates packages used in the modelling process of this repository.
 # Run it occasionally (especially after updating R itself) to keep packages up-to-date.
 
-library(checkpoint)
-checkpoint("2020-04-22")
 pkg_list <- c("RSQLite","rgdal","sp","rgeos","raster","maptools",
               "ROCR","vcd","abind","foreign","randomForest",
               "snow", "DBI", "knitr","RColorBrewer","rasterVis","xtable",

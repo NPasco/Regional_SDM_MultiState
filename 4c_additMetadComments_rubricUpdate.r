@@ -72,6 +72,7 @@ sql <- paste0("SELECT v2_Elements.ID, ",
 evalAndReviewStatus <- dbGetQuery(cn, sql)
 
 modelCycleData <- evalAndReviewStatus[,c("cutecode","model_cycle")]
+
 # if more than one cycle, get the most recent cycle
 if(nrow(evalAndReviewStatus) > 1){
   evalAndReviewStatus <- evalAndReviewStatus[order(evalAndReviewStatus$model_cycle, decreasing = TRUE),]
@@ -93,6 +94,7 @@ db <- dbConnect(SQLite(),dbname=nm_db_file)
 sql <- paste0("update lkpSpeciesRubric set spdata_dataqual = '", dqUpdate$dqAttribute, 
               "', spdata_dataqualNotes = '", dqUpdate$dqComments, 
               "' where sp_code = '", ElementNames$Code, "' ;")
+
 dbExecute(db, statement = sql)
 
 ## performance ----
@@ -111,6 +113,7 @@ prfmUpdate <- prfmcMatrix[match(prfmAtt, prfmcMatrix$pAttribute),]
 sql <- paste0("update lkpSpeciesRubric set process_perform = '", prfmUpdate$pAttribute, 
               "', process_performNotes = '", prfmUpdate$pComments, 
               "' where sp_code = '", ElementNames$Code, "' ;")
+
 dbExecute(db, statement = sql)
 
 ## model review ----
@@ -122,6 +125,7 @@ revUpdate <- revMatrix[match(revAtt, revMatrix$rAttribute),]
 sql <- paste0("update lkpSpeciesRubric set process_review = '", revUpdate$rAttribute, 
               "', process_reviewNotes = '", revUpdate$rComments, 
               "' where sp_code = '", ElementNames$Code, "' ;")
+
 dbExecute(db, statement = sql)
 
 ## iterative ----
@@ -146,6 +150,7 @@ iterUpdate <- iterMatrix[match(iterAtt, iterMatrix$iAttribute),]
 sql <- paste0("update lkpSpeciesRubric set iterative = '", iterUpdate$iAttribute, 
               "', iterativeNotes = '", iterUpdate$iComments, 
               "' where sp_code = '", ElementNames$Code, "' ;")
+
 dbExecute(db, statement = sql)
 
 ## clean up ----

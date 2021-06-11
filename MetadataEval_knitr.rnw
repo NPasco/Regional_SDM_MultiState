@@ -145,48 +145,49 @@ par(mar=c(3,3,3,3),   #bottom, left, top, right
 # first a blank plot
 plot(0.5,0.5,lwd=0, col = "white", xlim = c(0,1), ylim = c(0,1),
      xlab="Avg. false positive rate", ylab="Avg. true positive rate")
-# now add each that was run
+
+# now add each that was run  
 #if no validation, then this will fail. Used to use if(exists("rf.perf"))...
-# for(algo in ensemble_algos){
+for(algo in ensemble_algos){
   if(algo == "rf" & exists("rf.perf")){
     specs <- figSpecs[match(algo,figSpecs$algos),]
     plot(rf.perf,
-         lwd=specs$lwd,
+         lwd=specs$lwd, 
          col=specs$col,
-         avg="threshold",
+         avg="threshold", 
          add = TRUE)
   }
-   if(algo == "me" & exists("me.perf")){
-     specs <- figSpecs[match(algo,figSpecs$algos),]
-     plot(me.perf,
-          lwd=specs$lwd,
-          col=specs$col,
-          avg="threshold",
-          add = TRUE)
-   }
-   if(algo == "xgb"){
-     xgb.pred <- prediction(xgbFit1$pred$pres, xgbFit1$pred$obs)
-     xgb.perf <- performance(xgb.pred, "tpr","fpr")
-     specs <- figSpecs[match(algo,figSpecs$algos),]
-   plot(xgb.perf,
-          lwd=specs$lwd,
-          col=specs$col,
-          avg="threshold",
-          add = TRUE)
-   }
- 
- #possible else if no models were validated: text(0.5,0.5, "No evaluation")
+  if(algo == "me" & exists("me.perf")){
+    specs <- figSpecs[match(algo,figSpecs$algos),]
+    plot(me.perf, 
+         lwd=specs$lwd, 
+         col=specs$col,
+         avg="threshold", 
+         add = TRUE)
+  }
+  if(algo == "xgb"){
+    xgb.pred <- prediction(xgbFit1$pred$pres, xgbFit1$pred$obs)
+    xgb.perf <- performance(xgb.pred, "tpr","fpr")
+    specs <- figSpecs[match(algo,figSpecs$algos),]
+    plot(xgb.perf, 
+         lwd=specs$lwd, 
+         col=specs$col,
+         avg="threshold", 
+         add = TRUE)
+  }
+}
+#possible else if no models were validated: text(0.5,0.5, "No evaluation")
 
- legend("bottomright", ensemble_algos,
-        col = figSpecs[match(ensemble_algos,figSpecs$algos),"col"],
-        lwd = figSpecs[match(ensemble_algos,figSpecs$algos),"lwd"],
-        lty = figSpecs[match(ensemble_algos,figSpecs$algos),"lty"],
-        text.col = "black",
-        merge = TRUE, bg = "gray95")
-
- @
- \includegraphics{figure/ROCplot-1.pdf} %place it
- \end{center}
+legend("bottomright", ensemble_algos, 
+       col = figSpecs[match(ensemble_algos,figSpecs$algos),"col"],
+       lwd = figSpecs[match(ensemble_algos,figSpecs$algos),"lwd"],
+       lty = figSpecs[match(ensemble_algos,figSpecs$algos),"lty"],
+       text.col = "black", 
+       merge = TRUE, bg = "gray95")
+  
+@
+\includegraphics{figure/ROCplot-1.pdf} %place it    
+\end{center}
 Figure 2. ROC plot for all \Sexpr{length(group$vals)} validation runs, 
 averaged along cutoffs, for each modeling algorithm.
 
@@ -315,14 +316,14 @@ if(length(sdm.customComments.subset$comments) > 1){
 @
 \pagebreak
 \begin{center}
- <<mapFig, fig.width=7, fig.height=7, include=FALSE, echo=FALSE, dev='png', dpi=200>>=
+<<mapFig, fig.width=7, fig.height=7, include=FALSE, echo=FALSE, dev='png', dpi=200>>=
 
- print(mapFig)
+print(mapFig)
 
- @
-\includegraphics{figure/mapFig-1.png}
+@
+\includegraphics{figure/mapFig-1.png}    
 \end{center}
- Figure 4. A generalized view of the model predictions throughout the modeled area. If an ensemble was created this map shows simply an average of all model predictions. State boundaries are depicted as a thin gray line. The modeled area is outlined in red. Basemap: CartoDB.Positron (\copyright  \href{https://www.openstreetmap.org/copyright}{OpenStreetMap}, contributors: \copyright  \href{https://carto.com/attributions}{CARTO}).
+Figure 4. A generalized view of the model predictions throughout the modeled area. If an ensemble was created this map shows simply an average of all model predictions. State boundaries are depicted as a thin gray line. The modeled area is outlined in red. Basemap: CartoDB.Positron (\copyright  \href{https://www.openstreetmap.org/copyright}{OpenStreetMap}, contributors: \copyright  \href{https://carto.com/attributions}{CARTO}).
 
 \normalsize
 
@@ -356,7 +357,6 @@ This model was built using a methodology developed through collaboration among t
 \begin{minipage}[c]{0.75\linewidth}
 Please cite this document and its associated SDM as: \\
 NatureServe and Heritage Network Partners. \Sexpr{format(Sys.Date(), "%Y")}. Species distribution model for \Sexpr{as.character(ElementNames$CommName)} (\textit{\Sexpr{as.character(ElementNames$SciName)}}). Created on \Sexpr{format(Sys.Date(), "%d %b %Y")}. Arlington, VA with Network partners from FL.
-\end{minipage}
 }
 
 \medskip

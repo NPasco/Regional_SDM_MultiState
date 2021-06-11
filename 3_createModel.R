@@ -13,7 +13,6 @@ library(foreign) #for reading dbf files
 library(randomForest)
 library(iterators)
 library(doParallel)
-library(here)
 
 source(paste0(loc_scripts, "/helper/modelrun_meta_data.R"), local = FALSE) # generates modelrun_meta_data
 
@@ -54,6 +53,7 @@ rm(db, SQLquery)
 
 # are we using the 330 m raster set? if so, rename df.abs
 # all 330m raster names begin with "z3"
+
 #if(length(grep("z3",names(df.in))) > 0){
 #  db <- dbConnect(SQLite(),dbname=nm_db_file)
 #  sql <- "SELECT names_30m, names_330m from mapEnvVarDifferentResolutions;"

@@ -4,9 +4,6 @@ setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regio
 ## start with a fresh workspace with no objects loaded
 rm(list=ls())
 
-library(checkpoint)
-checkpoint("2020-04-22", scanForPackages = FALSE)
-
 library(raster)
 library(sf)
 library(here)
@@ -15,6 +12,7 @@ library(snowfall)
 
 # path where .tif env. var rasters are stored
 pathToRas <- here("_data","env_vars","raster","ras")
+
 # path to output tables
 pathToTab <- here("_data","env_vars","tabular")
 # background points table name (this should be already created with preproc_makeBackgroundPoints.R)
@@ -27,6 +25,7 @@ setwd(pathToRas)
 
 ## create a stack.
 raslist <- list.files(pattern = ".tif$", recursive = TRUE)
+
 raslist1 <- raslist[1:6]
 raslist2 <- c(raslist[7:8], raslist[92],raslist[104], raslist[106])
 raslist3 <- raslist[11:16]
@@ -42,6 +41,7 @@ raslist12 <- raslist[73:78]
 raslist13 <- raslist[79:84]
 raslist14 <- raslist[85:90]
 raslist15 <- raslist[98:102]
+
 #x <- grepl("ras/",raslist)
 #raslist <- raslist[!grepl("ras/",raslist)]
 
@@ -214,5 +214,4 @@ rm(db)
 
 ## clean up ----
 # remove all objects before using another script
-rm(list=ls()
-   
+rm(list=ls())

@@ -1,9 +1,6 @@
 # File: user_run_SDM.r
 # Purpose: Run a new, full SDM model (all steps)
-setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regional_SDM_1")
-#run pkg_check.R
-library(checkpoint)
-checkpoint("2020-04-22", scanForPackages = FALSE)
+setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regional_SDM_MultiState")
 
 library(here)
 rm(list=ls())
@@ -11,10 +8,8 @@ rm(list=ls())
 
 # Step 1: Setting for the model run
 
-## NOTE: set up as template for github. Note general defaults and "<< >>" where text would be expected
-
 # species code (from lkpSpecies in modelling database. This will be the new folder name containing inputs/ouptuts)
-model_species <- "lampmean"
+model_species <- "hymehenr"
 # loc_scripts is your repository. Make sure your git repository is set to correct branch
 loc_scripts <- here()
 # The main modelling folder for inputs/outputs. All sub-folders are created during the model run (when starting with step 1)
@@ -27,14 +22,13 @@ nm_presFile <- here("_data", "occurrence", paste0(model_species, ".shp"))
 # env vars location [Terrestrial-only variable]
 loc_envVars = here("_data","env_vars","raster", "ras")
 # loc_envVars = here("_data","env_vars","raster")
-
 # Name of background/envvars sqlite geodatabase, and base table name (2 length vector)
 nm_bkgPts <- c(here("_data","env_vars","tabular", "background.sqlite"), "background_pts")
 # HUC spatial data set (shapefile) that is subsetted and used to define modeling area//range
 nm_HUC_file <- here("_data","other_spatial","feature","HUC10_FL.shp")
 # map reference boundaries
 # used as background grey reference lines in map in pdf
-nm_refBoundaries = here("_data","other_spatial","feature", "US_States.shp")  
+nm_refBoundaries = here("_data","other_spatial","feature", "US_States.shp")
 # background exclusion file (areas where you know presence points weren't collected [such as Tribal lands],
 # and thus where background points should be exluded)
 #   set up as geopackage, set as NULL if there are no exclusion areas
@@ -48,8 +42,7 @@ nm_bkgExclAreas <- NULL
 nm_biasDistRas <- NULL
 
 # project overview - this appears in the first paragraph of the metadata
-
-project_overview = "This model was developed for <<some text here>>."
+project_overview = "This model was developed for the U. S. Fish and Wildlife."
 
 # model comment in database
 model_comments = ""
@@ -58,7 +51,7 @@ model_comments = ""
 metaData_comments = ""
 
 # your name
-modeller = "<<modeler name>>"
+modeller = "Nathan Pasco"
 
 # list the algorithms to apply in an ensemble model
 # options currently: "rf" (random forest), 
@@ -137,7 +130,7 @@ run_SDM(
 # The scripts will automatically be accessed from 'loc_scripts' (if provided) 
 
 # or the location that was specified for the original model run. 
-setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regional_SDM_1")
+setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regional_SDM_MultiState")
 library(here)
 rm(list=ls())
 
@@ -155,12 +148,12 @@ source(here("helper", "run_SDM.R"))
   # to add/remove variables, begin at step 2
   # to just run new model, begin at step 3 (see next example)
 run_SDM(
+
   begin_step = "2",
   model_species = "lythflag",
   loc_model = here("_data", "species"),
   loc_scripts = loc_scripts
 )
-
 
 # example pick-up a model run at step 5 (metadata create)
   # if starting at step 4 or later, must provide model run name to model_rdata
@@ -187,15 +180,14 @@ run_SDM(
   loc_scripts = loc_scripts,
   model_rdata = "rhodchap_20210219_133418.Rdata"
 )
+
 ########## 
 ##########
 ##########
 
 # TESTING / DEBUGGING ONLY
 
-setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regional_SDM_1")
-library(checkpoint)
-checkpoint("2020-04-22", scanForPackages = FALSE)
+setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regional_SDM_MultiState")
 
 library(here)
 rm(list=ls())
@@ -210,6 +202,7 @@ model_species <- "lampmean"
 #load(here("_data","species",model_species,"runSDM_paths_most_recent.Rdata"))
 # if you want an earlier run, enter it and load it here:
 load(here("_data","species",model_species,"runSDM_paths_lampmean_20210405_121500.Rdata"))
+
 for(i in 1:length(fn_args)) assign(names(fn_args)[i], fn_args[[i]])
 
 # if debugging script 4 or later, also load the specific model output rdata file
@@ -261,12 +254,3 @@ for(sv in 1:length(sppVec)){
       prompt = FALSE
     )
   }
-
-
-
-
-
-
-
-
-

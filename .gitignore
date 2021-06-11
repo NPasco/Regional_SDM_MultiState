@@ -12,7 +12,11 @@
 *.gitignore
 
 # user_run_SDM user-files
+<<<<<<< HEAD
 user_run_SDM_*
 
 Colea*
 delete_me
+=======
+user_run_SDM_*
+>>>>>>> a4f1f4f4e2d9347f8a99812011ff6e9a5c99cdbd

@@ -3,6 +3,7 @@
 
 ## start with a fresh workspace with no objects loaded
 setwd("G:\\_Projects\\USFWS_SE\\Users\\NathanPasco\\USFWS_SE\\Terrestrial\\Regional_SDM_MultiState")
+
 rm(list=ls())
 library(sf)
 library(here)
@@ -17,7 +18,8 @@ stdyAreaHucs <- st_read("HUC10_SE.shp")
 # continual problems with ESRI Albers. Set it here manually
 # ignore the warning
 # st_crs(stdyArea) <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
-# suppressWarnings(st_crs(stdyAreaHucs) <- 42303)
+
+suppressWarnings(st_crs(stdyAreaHucs) <- 42303)
 
 # #study area is a dissolved representation
 sa <- st_union(stdyAreaHucs)
@@ -58,10 +60,7 @@ try(dbExecute(db, paste0("DELETE FROM lkpCRS where table_name = '", table, "';")
 dbWriteTable(db, "lkpCRS", tcrs, append = TRUE)
 
 # also write to geopackage  
-#st_write(samps, dsn = paste0(pathToPts, "/", table, ".gpkg"),
-#         layer = "bkg_pts",
-#         delete_layer = TRUE)
-st_write(samps, dsn = paste0(pathToPts, "/", table, ".shp"),
+st_write(samps, dsn = paste0(pathToPts, "/", table, ".gpkg"),
          layer = "bkg_pts",
          delete_layer = TRUE)
 

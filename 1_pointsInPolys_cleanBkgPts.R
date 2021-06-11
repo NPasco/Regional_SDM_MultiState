@@ -386,6 +386,7 @@ if(nrow(backgSubset) > bkgTarg){
 print(paste0("number of background pts: ", nrow(backgSubset)))
 
 #write it up and do join in sqlite (faster than downloading entire att set) ----
+
 st_geometry(backgSubset) <- NULL
 tmpTableName <- paste0(nm_bkgPts[2], "_", baseName)
 dbWriteTable(db, tmpTableName, backgSubset, overwrite = TRUE)
@@ -408,7 +409,6 @@ fidlocs <- grep("fid.*",names(bgSubsAtt))
 if(length(fidlocs) > 1){
   bgSubsAtt <- bgSubsAtt[,-fidlocs[2:length(fidlocs)]]  
 }
-
 
 bgSubsAtt <- bgSubsAtt[complete.cases(bgSubsAtt),]
 nrow(bgSubsAtt)
