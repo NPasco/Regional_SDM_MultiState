@@ -53,22 +53,21 @@ rm(db, SQLquery)
 
 # are we using the 330 m raster set? if so, rename df.abs
 # all 330m raster names begin with "z3"
-
-#if(length(grep("z3",names(df.in))) > 0){
-#  db <- dbConnect(SQLite(),dbname=nm_db_file)
-#  sql <- "SELECT names_30m, names_330m from mapEnvVarDifferentResolutions;"
-#  envarNames <- dbGetQuery(db, statement = sql, stringsAsFactors = FALSE) 
-#  envarNames <- data.frame(sapply(envarNames, FUN = function(x) tolower(x)), stringsAsFactors = FALSE)
-#  names(df.abs) <- tolower(names(df.abs))
-#  namesDF <- data.frame(absNames = names(df.abs), stringsAsFactors = FALSE)
-#  namesDF <- merge(namesDF, envarNames, by.x = "absNames", by.y = "names_30m", all.x = TRUE)
-#  namesDF$names_330m[is.na(namesDF$names_330m)] <- namesDF$absNames[is.na(namesDF$names_330m)]
- # order them, then rename them
-#  df.abs <- df.abs[,namesDF$absNames]
-#  names(df.abs) <- namesDF$names_330m
-#  dbDisconnect(db)
-#  rm(db, sql, envarNames, namesDF)
-#  }
+if(length(grep("z3",names(df.in))) > 0){
+  db <- dbConnect(SQLite(),dbname=nm_db_file)
+  sql <- "SELECT names_30m, names_330m from mapEnvVarDifferentResolutions;"
+  envarNames <- dbGetQuery(db, statement = sql, stringsAsFactors = FALSE) 
+  envarNames <- data.frame(sapply(envarNames, FUN = function(x) tolower(x)), stringsAsFactors = FALSE)
+  names(df.abs) <- tolower(names(df.abs))
+  namesDF <- data.frame(absNames = names(df.abs), stringsAsFactors = FALSE)
+  namesDF <- merge(namesDF, envarNames, by.x = "absNames", by.y = "names_30m", all.x = TRUE)
+  namesDF$names_330m[is.na(namesDF$names_330m)] <- namesDF$absNames[is.na(namesDF$names_330m)]
+  # order them, then rename them
+  df.abs <- df.abs[,namesDF$absNames]
+  names(df.abs) <- namesDF$names_330m
+  dbDisconnect(db)
+  rm(db, sql, envarNames, namesDF)
+}
 
 #make sure we don't have any NAs
 df.in <- df.in[complete.cases(df.in[,!names(df.in) %in% c("obsdate","date")]),]  # to ensure missing dates are not excluding records
@@ -79,7 +78,7 @@ df.abs <- df.abs[complete.cases(df.abs),]
 df.in <- cbind(df.in, pres=1)
 df.abs$stratum <- "pseu-a"
 df.abs <- cbind(df.abs, GROUP_ID="pseu-a", 
-					pres=0, RA="high", SPECIES_CD="background")
+                pres=0, RA="high", SPECIES_CD="background")
 
 # lower case column names
 names(df.in) <- tolower(names(df.in))

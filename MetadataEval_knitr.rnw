@@ -145,7 +145,6 @@ par(mar=c(3,3,3,3),   #bottom, left, top, right
 # first a blank plot
 plot(0.5,0.5,lwd=0, col = "white", xlim = c(0,1), ylim = c(0,1),
      xlab="Avg. false positive rate", ylab="Avg. true positive rate")
-
 # now add each that was run  
 #if no validation, then this will fail. Used to use if(exists("rf.perf"))...
 for(algo in ensemble_algos){
@@ -356,7 +355,8 @@ This model was built using a methodology developed through collaboration among t
 \end{minipage}%
 \begin{minipage}[c]{0.75\linewidth}
 Please cite this document and its associated SDM as: \\
-NatureServe and Heritage Network Partners. \Sexpr{format(Sys.Date(), "%Y")}. Species distribution model for \Sexpr{as.character(ElementNames$CommName)} (\textit{\Sexpr{as.character(ElementNames$SciName)}}). Created on \Sexpr{format(Sys.Date(), "%d %b %Y")}. Arlington, VA with Network partners from FL.
+NatureServe and Heritage Network Partners. \Sexpr{format(Sys.Date(), "%Y")}. Species distribution model for \Sexpr{as.character(ElementNames$CommName)} (\textit{\Sexpr{as.character(ElementNames$SciName)}}). Created on \Sexpr{format(Sys.Date(), "%d %b %Y")}. Arlington, VA with Network partners from VA, PA, and NY.
+\end{minipage}
 }
 
 \medskip
@@ -398,10 +398,10 @@ NatureServe and Heritage Network Partners. \Sexpr{format(Sys.Date(), "%Y")}. Spe
     21(20):3940-3941.
   \bibitem{LiuEtAl2005} Liu, C., P. M. Berry, T. P. Dawson, and R. G. Pearson. 2005. 
     Selecting thresholds of occurrence in the prediction of species distributions. 
-    Ecography 28:385–393.
+    Ecography 28:385-393.
   \bibitem{LiuEtAl2015} Liu, C., G. Newell, and M. White. 2015. On the selection of 
     thresholds for predicting species occurrence with presence-only data. Ecology and 
-    Evolution 6:337–348. 
+    Evolution 6:337-348. 
   \bibitem{SofaerEtAl2019} Sofaer, H. R., C. S. Jarnevich1, I. S. Pearse, R. L. Smyth, S. Auer, G. L. Cook, T. C. Edwards, Jr., G. F. Guala, T. G. Howard, J. T. Morisette, and H. Hamilton. 2019. The development and delivery of species distribution models to inform decision-making. BioScience 69:544-557.
 \end{thebibliography}
 

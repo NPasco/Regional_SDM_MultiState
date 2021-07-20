@@ -9,7 +9,7 @@ rm(list=ls())
 # Step 1: Setting for the model run
 
 # species code (from lkpSpecies in modelling database. This will be the new folder name containing inputs/ouptuts)
-model_species <- "hymehenr"
+model_species <- "pitumugi"
 # loc_scripts is your repository. Make sure your git repository is set to correct branch
 loc_scripts <- here()
 # The main modelling folder for inputs/outputs. All sub-folders are created during the model run (when starting with step 1)
@@ -25,7 +25,7 @@ loc_envVars = here("_data","env_vars","raster", "ras")
 # Name of background/envvars sqlite geodatabase, and base table name (2 length vector)
 nm_bkgPts <- c(here("_data","env_vars","tabular", "background.sqlite"), "background_pts")
 # HUC spatial data set (shapefile) that is subsetted and used to define modeling area//range
-nm_HUC_file <- here("_data","other_spatial","feature","HUC10_FL.shp")
+nm_HUC_file <- here("_data","other_spatial","feature","HUC10_SE.shp")
 # map reference boundaries
 # used as background grey reference lines in map in pdf
 nm_refBoundaries = here("_data","other_spatial","feature", "US_States.shp")
@@ -51,22 +51,22 @@ model_comments = ""
 metaData_comments = ""
 
 # your name
-modeller = "Nathan Pasco"
+modeller = "Carly Voight"
 
 # list the algorithms to apply in an ensemble model
 # options currently: "rf" (random forest), 
 #                   "me" (maxent), 
 #                   "xgb" (extreme gradient boosting), 
 #                   [["gam" (generalized additive models) -- no not gam yet]]
-#ensemble_algos = c("rf","xgb")
-ensemble_algos = c("rf")
+ensemble_algos = c("me","rf","xgb")
+#ensemble_algos = c("rf")
 
 # list non-standard variables to add to model run
 add_vars = NULL
 # list standard variables to exclude from model run
 #remove_vars = NULL
 remove_vars = c("peakwarm10", "peakwarm1", "peak10", "peak1", "peakcool10", "peakcool1", "mountain10", "mountain1",
-"cliff1", "cliff10", "tp100x1000", "tp010x1000", "tpi001x1000", "slopex100", "geoalk", "geoextru", "geocoutw", "geofsed", "geoclay", "geoloam", "geoctill", "geosalsed", "flowacc") 
+"cliff1", "cliff10", "geoalk", "geoextru", "geocoutw", "geofsed", "geoclay", "geoloam", "geoctill", "geosalsed", "geopeat") 
 
 # do you want to stop execution after each modeling step (script)?
 prompt = FALSE
@@ -135,7 +135,7 @@ library(here)
 rm(list=ls())
 
 # set project folder and species code for this run
-model_species <- "lampmean"
+model_species <- "pitumugi"
 loc_model <- here("_data", "species")
 
 # set wd and load function
@@ -148,9 +148,8 @@ source(here("helper", "run_SDM.R"))
   # to add/remove variables, begin at step 2
   # to just run new model, begin at step 3 (see next example)
 run_SDM(
-
-  begin_step = "2",
-  model_species = "lythflag",
+  begin_step = "3",
+  model_species = "pitumugi",
   loc_model = here("_data", "species"),
   loc_scripts = loc_scripts
 )
@@ -158,19 +157,19 @@ run_SDM(
 # example pick-up a model run at step 5 (metadata create)
   # if starting at step 4 or later, must provide model run name to model_rdata
 run_SDM(
-  begin_step = "5",
-  model_species = "lampmean",
+  begin_step = "4",
+  model_species = "pitumugi",
   loc_model = here("_data", "species"),
   loc_scripts = loc_scripts,
-  model_rdata = "lampmean_20210405_121500.Rdata"
+  model_rdata = "pitumugi_20210712_115306.Rdata"
 )
 
 run_SDM(
   begin_step = "5",
-  model_species = "lythflag",
+  model_species = "lythcurt",
   loc_model = here("_data", "species"),
   loc_scripts = loc_scripts,
-  model_rdata = "lythflag_20210216_091129.Rdata"
+  model_rdata = "lythcurt_20210622_181907.Rdata"
 )
 
 run_SDM(
@@ -197,11 +196,11 @@ rm(list=ls())
 
 # for scripts 1-3, run just the following 3 lines
 
-model_species <- "lampmean"
+model_species <- "crotadam"
 
-#load(here("_data","species",model_species,"runSDM_paths_most_recent.Rdata"))
+load(here("_data","species",model_species,"runSDM_paths_most_recent.Rdata"))
 # if you want an earlier run, enter it and load it here:
-load(here("_data","species",model_species,"runSDM_paths_lampmean_20210405_121500.Rdata"))
+#load(here("_data","species",model_species,"runSDM_paths_lythcurt_20210616_163747.Rdata"))
 
 for(i in 1:length(fn_args)) assign(names(fn_args)[i], fn_args[[i]])
 
@@ -230,10 +229,10 @@ for(sv in 1:length(sppVec)){
       model_species = sppVec[[sv]],
       loc_scripts = here(), 
       nm_presFile <- here("_data", "occurrence", paste0(sub("-","_",model_species), ".gpkg")),
-      nm_db_file = here("_data", "databases", "SDM_lookupAndTracking_AZ_phase1spp.sqlite"), 
+      nm_db_file = here("_data", "databases", "SDM_lookupAndTracking_terres.sqlite"), 
       loc_model = here("_data", "species"),
       loc_envVars = here("_data","env_vars","rasterClipped"),
-      nm_bkgPts = c(here("_data","env_vars","tabular", "background_AZ.sqlite"), "background_pts"),
+      nm_bkgPts = c(here("_data","env_vars","tabular", "background.sqlite"), "background_pts"),
       nm_HUC_file = here("_data","other_spatial","feature","HUC10.shp"),
       nm_refBoundaries = here("_data","other_spatial","feature", "US_States.shp"), 
       nm_bkgExclAreas <- NULL,

@@ -12,7 +12,7 @@ seed_str <- gsub("[-: ]","",as.character(model_start_time))
 seed <- as.integer(substr(seed_str, nchar(seed_str)-8,nchar(seed_str)))
 model_run_name <- paste0(model_species, "_" , gsub(" ","_",gsub(c("-|:"),"",as.character(model_start_time))))
 if (modeller == "Your name") modeller <- sdat[['effective_user']]
-modelrun_meta_data <- list(model_run_name = model_run_name,
+modelrun_meta_data <<- list(model_run_name = model_run_name,
                            model_start_time=model_start_time,
                            modeller = modeller,
                            model_comp_name=model_comp_name,

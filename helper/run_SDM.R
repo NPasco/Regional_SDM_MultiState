@@ -20,6 +20,8 @@ run_SDM <- function(
   nm_bkgPts,
   nm_HUC_file,
   nm_refBoundaries,
+  nm_bkgExclAreas = NULL, 
+  nm_biasDistRas = NULL,
   project_overview = "",
   model_comments = "",
   metaData_comments = "",
@@ -71,6 +73,8 @@ run_SDM <- function(
       nm_bkgPts = nm_bkgPts,
       nm_HUC_file = nm_HUC_file,
       nm_refBoundaries = nm_refBoundaries,
+      nm_bkgExclAreas = nm_bkgExclAreas, 
+      nm_biasDistRas = nm_biasDistRas,
       project_overview = project_overview,
       model_comments = model_comments,
       metaData_comments = metaData_comments,
@@ -125,7 +129,7 @@ run_SDM <- function(
   if(!grepl("MiKTeX", Sys.getenv("PATH"))){
     stop("Need to add MiKTeX to your PATH environment, see https://github.com/HeritageNetwork/Regional_SDM/wiki/User-Customizations ")
   }
-    
+  
   # steps to run
   all_steps <- c("1","2","3","4","4b","4c","5")
   step_names <- c("1_pointsInPolys_cleanBkgPts.R",
@@ -151,7 +155,7 @@ run_SDM <- function(
     for(i in 1:length(fn_args)) assign(names(fn_args)[i], fn_args[[i]], envir = .GlobalEnv)
     # run script
     source(paste(loc_scripts, scrpt, sep = "/"), local = FALSE)
-
+    
     # clean up everything but loop objects
     rm(list=ls(envir = .GlobalEnv)
        [!ls(envir = .GlobalEnv) %in% c("scrpt","run_steps","prompt","modelrun_meta_data","fn_args","sv","sppVec","run_SDM","loc_scripts")], envir = .GlobalEnv)
