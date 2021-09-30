@@ -7,7 +7,7 @@
 
 #for maxent
 # give java more ram (1gb here) before loading dismo
-options(java.parameters = "-Xmx5g" )
+options(java.parameters = "-Xmx8g" )
 library(dismo)
 
 
@@ -45,7 +45,7 @@ if(nrow(corrdEVs) > 0 ){
 
 # set the percentile, here choosing above 25% percentile
 #envarPctile <- 0.25
-envarPctile <- 0.50
+envarPctile <- 0.80
 y <- quantile(impvals$imp, probs = envarPctile)
 impEnvVars <- impvals[impvals$imp > y,]
 subsetNumberofEnvars <- nrow(impEnvVars)

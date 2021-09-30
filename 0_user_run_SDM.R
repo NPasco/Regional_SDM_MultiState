@@ -9,7 +9,7 @@ rm(list=ls())
 # Step 1: Setting for the model run
 
 # species code (from lkpSpecies in modelling database. This will be the new folder name containing inputs/ouptuts)
-model_species <- "pitumugi"
+model_species <- "crotadam"
 # loc_scripts is your repository. Make sure your git repository is set to correct branch
 loc_scripts <- here()
 # The main modelling folder for inputs/outputs. All sub-folders are created during the model run (when starting with step 1)
@@ -25,7 +25,7 @@ loc_envVars = here("_data","env_vars","raster", "ras")
 # Name of background/envvars sqlite geodatabase, and base table name (2 length vector)
 nm_bkgPts <- c(here("_data","env_vars","tabular", "background.sqlite"), "background_pts")
 # HUC spatial data set (shapefile) that is subsetted and used to define modeling area//range
-nm_HUC_file <- here("_data","other_spatial","feature","HUC10_SE.shp")
+nm_HUC_file <- here("_data","other_spatial","feature","HUC10_Sub.shp")
 # map reference boundaries
 # used as background grey reference lines in map in pdf
 nm_refBoundaries = here("_data","other_spatial","feature", "US_States.shp")
@@ -45,28 +45,29 @@ nm_biasDistRas <- NULL
 project_overview = "This model was developed for the U. S. Fish and Wildlife."
 
 # model comment in database
-model_comments = ""
+model_comments = "adjusted envPctiles and xgb learning rate 0.01"
 
 # comment printed in PDF metadata
 metaData_comments = ""
 
 # your name
-modeller = "Carly Voight"
+modeller = "Nathan Pasco"
 
 # list the algorithms to apply in an ensemble model
 # options currently: "rf" (random forest), 
 #                   "me" (maxent), 
 #                   "xgb" (extreme gradient boosting), 
 #                   [["gam" (generalized additive models) -- no not gam yet]]
-ensemble_algos = c("me","rf","xgb")
+ensemble_algos = c("me", "rf","xgb")
 #ensemble_algos = c("rf")
 
 # list non-standard variables to add to model run
 add_vars = NULL
 # list standard variables to exclude from model run
 #remove_vars = NULL
-remove_vars = c("peakwarm10", "peakwarm1", "peak10", "peak1", "peakcool10", "peakcool1", "mountain10", "mountain1",
-"cliff1", "cliff10", "geoalk", "geoextru", "geocoutw", "geofsed", "geoclay", "geoloam", "geoctill", "geosalsed", "geopeat") 
+remove_vars = NULL
+
+
 
 # do you want to stop execution after each modeling step (script)?
 prompt = FALSE
@@ -161,7 +162,8 @@ run_SDM(
   model_species = "pitumugi",
   loc_model = here("_data", "species"),
   loc_scripts = loc_scripts,
-  model_rdata = "pitumugi_20210712_115306.Rdata"
+  ensemble_algos = c("rf","xgb"),
+  model_rdata = "pitumugi_20210722_165954.Rdata"
 )
 
 run_SDM(

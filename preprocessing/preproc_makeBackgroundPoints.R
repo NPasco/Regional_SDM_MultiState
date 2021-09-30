@@ -13,7 +13,7 @@ library(RSQLite)
 
 setwd(here("_data","other_spatial","feature"))
 # states <- st_read("US_States.shp")
-stdyAreaHucs <- st_read("HUC10_SE.shp")
+stdyAreaHucs <- st_read("HUC10_Sub.shp")
 
 # continual problems with ESRI Albers. Set it here manually
 # ignore the warning
@@ -25,7 +25,7 @@ suppressWarnings(st_crs(stdyAreaHucs) <- 42303)
 sa <- st_union(stdyAreaHucs)
 
 # number of points to generate
-numpts <- 200000
+numpts <- 400000
 
 # new/existing db table name (overwritten)
 table <- "background_pts"

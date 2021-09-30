@@ -11,7 +11,7 @@ library(RSQLite)
 library(snowfall)
 
 # path where .tif env. var rasters are stored
-pathToRas <- here("_data","env_vars","raster","ras")
+pathToRas <- here("_data","env_vars","raster", "soilmoisture")
 
 # path to output tables
 pathToTab <- here("_data","env_vars","tabular")
@@ -26,21 +26,20 @@ setwd(pathToRas)
 ## create a stack.
 raslist <- list.files(pattern = ".tif$", recursive = TRUE)
 
-raslist1 <- raslist[1:6]
-raslist2 <- c(raslist[7:8], raslist[92],raslist[104], raslist[106])
-raslist3 <- raslist[11:16]
-raslist4 <- raslist[17:22]
-raslist5 <- raslist[31:35]
-raslist6 <- raslist[36:42]
-raslist7 <- raslist[43:47]
-raslist8 <- raslist[48:54]
-raslist9 <- raslist[55:59]
-raslist10 <- raslist[60:66]
-raslist11 <- raslist[67:72]
-raslist12 <- raslist[73:78]
-raslist13 <- raslist[79:84]
-raslist14 <- raslist[85:90]
-raslist15 <- raslist[98:102]
+raslist1 <- raslist[1:8]
+raslist2 <- raslist[11:16]
+raslist3 <- raslist[17:22]
+raslist4 <- raslist[31:35]
+raslist5 <- raslist[36:42]
+raslist6 <- raslist[43:47]
+raslist7 <- raslist[48:54]
+raslist8 <- raslist[55:59]
+raslist9 <- raslist[60:66]
+raslist10 <- raslist[67:72]
+raslist11 <- raslist[73:78]
+raslist12 <- raslist[79:84]
+raslist13 <- raslist[85:90]
+raslist14 <- c(raslist[95], raslist[99:102], raslist[104], raslist[106])
 
 #x <- grepl("ras/",raslist)
 #raslist <- raslist[!grepl("ras/",raslist)]
@@ -56,14 +55,14 @@ raslist15 <- raslist[98:102]
 #   }
 # }
 
-  gridlist <- as.list(paste(pathToRas,raslist15,sep = "/"))
+  gridlist <- as.list(paste(pathToRas,raslist,sep = "/"))
   
   # get short names
   
   lkp <- dbGetQuery(dbLookup, "SELECT gridName, fileName from lkpEnvVars;")
   
   #align names
-  nm <- unlist(lapply(strsplit(raslist15, "/", fixed = TRUE), FUN = function(x) {x[length(x)]}))
+  nm <- unlist(lapply(strsplit(raslist, "/", fixed = TRUE), FUN = function(x) {x[length(x)]}))
   names(gridlist) <- nm
   
   shortNames <- merge(data.frame(fileName = names(gridlist)), lkp, all.x = TRUE)
@@ -121,7 +120,7 @@ raslist15 <- raslist[98:102]
     samps <- st_sf(bg, geometry = st_as_sfc(bg$wkt, crs = tcrs))
     
     # create an R cluster using all the machine cores minus two
-    sfInit(parallel=TRUE, cpus=parallel:::detectCores()-20)
+    sfInit(parallel=TRUE, cpus=parallel:::detectCores()-16)
     # Load the required packages inside the cluster
     sfLibrary(raster)
     sfLibrary(sf)
@@ -135,78 +134,78 @@ raslist15 <- raslist[98:102]
     print(paste0("done with ", i, " of 100 loops"))
   }
 
-# method #2, looping through subsets, no parallel ----
-# this uses all of setup in #1, except for the loop.
-#  RAM isn't a problem here, it just takes a very long time (like, weeks)
-for(i in 1:length(brkgrps)){
-  bg <- bkgd[brks == brkgrps[i],]
-  samps <- st_sf(bg, geometry = st_as_sfc(bg$wkt, crs = tcrs))
-  att <- extract(envStack, samps, method="simple")
-  sampsAtt <- as.data.frame(cbind(fid = as.integer(samps$fid), att))
-  dbWriteTable(db, paste0(pts_table, "_att"), sampsAtt, overwrite = FALSE, append = TRUE)
-  print(paste0("done with ", i, " of 100 loops"))
-}
-
-# method #3. no looping, in parallel ----
-
-bkgd <- dbReadTable(db, pts_table)
-#remove any huc12 nulls
-bkgd <- bkgd[complete.cases(bkgd),]
-
-tcrs <- dbGetQuery(db, paste0("SELECT proj4string p from lkpCRS where table_name = '", pts_table, "';"))$p
-samps <- st_sf(bkgd, geometry = st_as_sfc(bkgd$wkt, crs = tcrs))
-
-# multi-core method from here
-# https://gis.stackexchange.com/questions/253618/r-multicore-approach-to-extract-raster-values-using-spatial-points
-# Extract values to a data frame - multicore approach
-# First, convert raster stack to list of single raster layers
-s.list <- unstack(envStack)
-names(s.list) <- names(envStack)
-# create a R cluster using all the machine cores minus one
-sfInit(parallel=TRUE, cpus=parallel:::detectCores()-20)
-# Load the required packages inside the cluster
-sfLibrary(raster)
-sfLibrary(sf)
-# Run parallelized 'extract' function and stop cluster
-e.df <- sfSapply(s.list, extract, y=samps, method = "simple")
-sfStop()
-
-DF <- data.frame(e.df)
-sampsAtt <- as.data.frame(cbind(fid = as.integer(samps$fid), DF))
-
-# write to DB
-tp <- as.vector("INTEGER")
-names(tp) <- "fid"
-dbWriteTable(db, paste0(pts_table, "_att"), sampsAtt, overwrite = TRUE, field.types = tp)
-# not writing shapefile, since base shapefile already exists
-
-### method #4 no looping, no parallel (built for updating just one col in existing att table) ----
-#get bkg tbl
-bkgd <- dbReadTable(db, pts_table)
-#remove any huc12 nulls
-bkgd <- bkgd[complete.cases(bkgd),]
-# get existing att table
-bkgd_att <- dbReadTable(db, paste0(pts_table,"_att"))
-
-nrow(bkgd)
-nrow(bkgd_att)
-bk <- merge(bkgd, bkgd_att) #need to spatial info over to att
-samps <- st_sf(bk, geometry = st_as_sfc(bk$wkt, crs = tcrs))
-# do the extract
-att <- extract(envStack, samps, method="simple")
-
-#sampsAtt <- as.data.frame(cbind(fid = as.integer(samps$fid), att))
-#sampsAtt <- as.data.frame(cbind(samps, att))
-
-samps$nm_gypfine <- att[,"nm_gypfine"]
-st_geometry(samps) <- NULL
-samps <- samps[,names(bkgd_att)]
-sampsAtt <- samps
-dbWriteTable(db, paste0(pts_table, "_att"), sampsAtt, overwrite = TRUE)
+# # method #2, looping through subsets, no parallel ----
+# # this uses all of setup in #1, except for the loop.
+# #  RAM isn't a problem here, it just takes a very long time (like, weeks)
+# for(i in 1:length(brkgrps)){
+#   bg <- bkgd[brks == brkgrps[i],]
+#   samps <- st_sf(bg, geometry = st_as_sfc(bg$wkt, crs = tcrs))
+#   att <- extract(envStack, samps, method="simple")
+#   sampsAtt <- as.data.frame(cbind(fid = as.integer(samps$fid), att))
+#   dbWriteTable(db, paste0(pts_table, "_att"), sampsAtt, overwrite = FALSE, append = TRUE)
+#   print(paste0("done with ", i, " of 100 loops"))
+# }
+# 
+# # method #3. no looping, in parallel ----
+# 
+# bkgd <- dbReadTable(db, pts_table)
+# #remove any huc12 nulls
+# bkgd <- bkgd[complete.cases(bkgd),]
+# 
+# tcrs <- dbGetQuery(db, paste0("SELECT proj4string p from lkpCRS where table_name = '", pts_table, "';"))$p
+# samps <- st_sf(bkgd, geometry = st_as_sfc(bkgd$wkt, crs = tcrs))
+# 
+# # multi-core method from here
+# # https://gis.stackexchange.com/questions/253618/r-multicore-approach-to-extract-raster-values-using-spatial-points
+# # Extract values to a data frame - multicore approach
+# # First, convert raster stack to list of single raster layers
+# s.list <- unstack(envStack)
+# names(s.list) <- names(envStack)
+# # create a R cluster using all the machine cores minus one
+# sfInit(parallel=TRUE, cpus=parallel:::detectCores()-20)
+# # Load the required packages inside the cluster
+# sfLibrary(raster)
+# sfLibrary(sf)
+# # Run parallelized 'extract' function and stop cluster
+# e.df <- sfSapply(s.list, extract, y=samps, method = "simple")
+# sfStop()
+# 
+# DF <- data.frame(e.df)
+# sampsAtt <- as.data.frame(cbind(fid = as.integer(samps$fid), DF))
+# 
+# # write to DB
+# tp <- as.vector("INTEGER")
+# names(tp) <- "fid"
+# dbWriteTable(db, paste0(pts_table, "_att"), sampsAtt, overwrite = TRUE, field.types = tp)
+# # not writing shapefile, since base shapefile already exists
+# 
+# ### method #4 no looping, no parallel (built for updating just one col in existing att table) ----
+# #get bkg tbl
+# bkgd <- dbReadTable(db, pts_table)
+# #remove any huc12 nulls
+# bkgd <- bkgd[complete.cases(bkgd),]
+# # get existing att table
+# bkgd_att <- dbReadTable(db, paste0(pts_table,"_att"))
+# 
+# nrow(bkgd)
+# nrow(bkgd_att)
+# bk <- merge(bkgd, bkgd_att) #need to spatial info over to att
+# samps <- st_sf(bk, geometry = st_as_sfc(bk$wkt, crs = tcrs))
+# # do the extract
+# att <- extract(envStack, samps, method="simple")
+# 
+# #sampsAtt <- as.data.frame(cbind(fid = as.integer(samps$fid), att))
+# #sampsAtt <- as.data.frame(cbind(samps, att))
+# 
+# samps$nm_gypfine <- att[,"nm_gypfine"]
+# st_geometry(samps) <- NULL
+# samps <- samps[,names(bkgd_att)]
+# sampsAtt <- samps
+# dbWriteTable(db, paste0(pts_table, "_att"), sampsAtt, overwrite = TRUE)
 
 
 ###
-dbWriteTable(db, paste0(pts_table, "_att"), sampsAtt, overwrite = FALSE, append = TRUE)
+dbWriteTable(db, paste0(pts_table, "_att14"), sampsAtt, overwrite = FALSE, append = TRUE)
 
 
 dbDisconnect(db)

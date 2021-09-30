@@ -25,8 +25,8 @@ df.full.xgb <- xgb.DMatrix(as.matrix(df.full[,indVarCols]),
 
 param <- list(
   booster = "gbtree",
-  max_depth = 5, 
-  eta = 0.3, 
+  max_depth = 8, 
+  eta = 0.01, 
   verbose = 0, 
   nthread = 4,
   objective = "binary:logistic", 
@@ -53,7 +53,7 @@ if(nrow(corrdEVs) > 0 ){
 }
 
 # set the percentile, here choosing above 25% percentile
-envarPctile <- 0.25
+envarPctile <- 0.30
 y <- quantile(xgb.impvals$Gain, probs = envarPctile)
 impEnvVars <- xgb.impvals[xgb.impvals$Gain > y,]
 subsetNumberofEnvars <- nrow(impEnvVars)
